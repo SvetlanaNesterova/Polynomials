@@ -54,19 +54,23 @@ class Polynom:
         returns Polynom, which is a result of multiplication
         """
         result = Polynom("")
-        result.monoms = copy.deepcopy(self.monoms)
 
         if type(other) == Polynom:
             for monom in other.monoms:
-                result._mul_on_monom(monom)
-        elif type(other) == Monom:
-            result._mul_on_monom(other)
-        elif type(other) == int:
-            multiplier = Monom()
-            multiplier.multiply(other)
-            result._mul_on_monom(multiplier)
+                multiplier = Polynom("")
+                multiplier.monoms = copy.deepcopy(self.monoms)
+                multiplier._mul_on_monom(monom)
+                result += multiplier
         else:
-            raise TypeError("Multiplier should be Polynom, Monom, or int")
+            result.monoms = copy.deepcopy(self.monoms)
+            if type(other) == Monom:
+                result._mul_on_monom(other)
+            elif type(other) == int:
+                multiplier = Monom()
+                multiplier.multiply(other)
+                result._mul_on_monom(multiplier)
+            else:
+                raise TypeError("Multiplier should be Polynom, Monom, or int")
         return result
 
     def _mul_on_monom(self, multiplier):
@@ -75,8 +79,8 @@ class Polynom:
         """
         for monom in self.monoms:
             multiplication = monom.multiply(multiplier)
-            self.monoms.remove(monom)
-            self.monoms.append(multiplication)
+            #self.monoms.remove(monom)
+            #self.monoms.append(multiplication)
 
     def __pow__(self, power, modulo=None):
         """

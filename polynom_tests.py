@@ -24,11 +24,11 @@ class TestPolynom(unittest.TestCase):
         result = Polynom("128") + Polynom("7*x")
         self.assertEqual(str(result), "7*x + 128")
 
-    def test_same_addents_reduction(self):
+    def test_same_addends_reduction(self):
         result = Polynom("156*x*y*z") + Polynom("234*x*y*z")
         self.assertEqual(str(result), "390*x*y*z")
 
-    def test_many_same_addents_reduction(self):
+    def test_many_same_addends_reduction(self):
         result = Polynom("10*x^6 - y^5 + x^3*y^2 + t*z^4") + Polynom("x^6 - 8*y^5 - 10*x^3*y^2 + t*z^4")
         self.assertEqual(str(result), "11*x^6 + 2*t*z^4 + (-9*x^3*y^2) + (-9*y^5)")
 
@@ -76,7 +76,19 @@ class TestPolynom(unittest.TestCase):
         result = a * b
         self.assertEqual(str(result), "a*b")
 
-    def test_multiplication_on_zero(self):
+    def test_multiplication_sum_on_number(self):
+        a = Polynom("a+b")
+        b = Polynom("7")
+        result = a * b
+        self.assertEqual(str(result), "7*a + 7*b")
+
+    def test_multiplication_sum_on_variable(self):
+        a = Polynom("a+b")
+        b = Polynom("c")
+        result = a * b
+        self.assertEqual(str(result), "a*c + b*c")
+
+    def test_multiplication_sum_on_zero(self):
         a = Polynom("a+b")
         b = Polynom("0")
         result = a * b
@@ -88,8 +100,20 @@ class TestPolynom(unittest.TestCase):
         result = a * b
         self.assertEqual(str(result), "8*a*b")
 
-    def test_two_polynoms_multiplication(self):
+    def test_two_polynomials_multiplication(self):
         a = Polynom("a + b")
         b = Polynom("c + d")
         result = a * b
         self.assertEqual(str(result), "a*c + a*d + b*c + b*d")
+
+    def test_sum_in_square(self):
+        a = Polynom("(a + b)^2")
+        self.assertEqual(str(a), "a^2 + 2*a*b + b^2")
+
+    def test_substraction_in_square(self):
+        a = Polynom("(a - b)^2")
+        self.assertEqual(str(a), "a^2 + (-2*a*b) + b^2")
+
+    def test_square_substraction(self):
+        a = Polynom("(a - b)(a + b)")
+        self.assertEqual(str(a), "a^2 + (-b^2)")

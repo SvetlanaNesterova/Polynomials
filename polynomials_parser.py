@@ -23,8 +23,8 @@ def to_polynomial_from_monomial_str(value):
         monomial.multiply(-1)
         value = value[1:]
     monomial.multiply(value)
-    polynomial= polynom.Polynom("")
-    polynomial+= monomial
+    polynomial = polynom.Polynom("")
+    polynomial += monomial
     return polynomial
 
 
