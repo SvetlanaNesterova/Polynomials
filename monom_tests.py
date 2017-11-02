@@ -132,6 +132,24 @@ class TestMonom(unittest.TestCase):
         m.multiply("a")
         self.assertEqual(str(m), "a*b*c*d*f*z")
 
+    def test_multiplication_on_monom(self):
+        a = Monom()
+        b = Monom()
+        a.multiply(10, 2)
+        a.multiply("x", 3)
+        b.multiply("a", -1)
+        b.multiply(-5)
+        a.multiply(b)
+        self.assertEqual(str(a), "-500*a^(-1)*x^3")
+
+    def test_multiplication_on_monom_answer_one(self):
+        a = Monom()
+        b = Monom()
+        a.multiply("x", 3)
+        b.multiply("x", -3)
+        a.multiply(b)
+        self.assertEqual(str(a), "1")
+
     def test_multiplication_on_variable_of_wrong_type(self):
         m = Monom()
         self.assertRaises(TypeError, m.multiply, 1.2)

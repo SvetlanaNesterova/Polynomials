@@ -1,29 +1,86 @@
-from polynomials_parser import Parser
+import polynomials_parser
+import copy
+from monom import Monom
 
 class Polynom:
     def __init__(self, source):
-        if type(source) == str:
-            self.monoms = Parser.parse(source)
-
-        raise NotImplemented()
+        if type(source) != str:
+            raise TypeError("Source should be a string.")
+        self.monoms = polynomials_parser.Parser().parse(source)
 
     def __add__(self, other):
         """
-        gets other Polynom or scalar
+        gets other Polynom, Monom, or scalar
         returns Polynom, which is a result of summation
         """
-        raise NotImplemented()
+        result = Polynom("")
+        result.monoms = copy.deepcopy(self.monoms)
+
+        if type(other) == Polynom:
+            for monom in other.monoms:
+                result._add_monom(monom)
+        elif type(other) == Monom:
+            result._add_monom(other)
+        elif type(other) == int:
+            additional = Monom()
+            additional.multiply(other)
+            result._add_monom(additional)
+        else:
+            raise TypeError("Additional should be Polynom, Monom, or int")
+        return result
+
+    def _add_monom(self, additional):
+        """
+        This method spoils self
+        """
+        for monom in self.monoms:
+            if monom.is_simular_monom(additional):
+                summa = monom.add(additional)
+                self.monoms.remove(monom)
+                self.monoms.append(summa)
+                return
+        self.monoms.append(additional)
 
     def __mul__(self, other):
         """
-        gets other Polynom or scalar
+        gets other Polynom, Monom or scalar
         returns Polynom, which is a result of multiplication
+        """
+        result = Polynom("")
+        result.monoms = copy.deepcopy(self.monoms)
+
+        if type(other) == Polynom:
+            for monom in other.monoms:
+                result._mul_on_monom(monom)
+        elif type(other) == Monom:
+            result._mul_on_monom(other)
+        elif type(other) == int:
+            multiplier = Monom()
+            multiplier.multiply(other)
+            result._mul_on_monom(multiplier)
+        else:
+            raise TypeError("Multiplier should be Polynom, Monom, or int")
+        return result
+
+    def _mul_on_monom(self, multiplier):
+        """
+        This method spoils self
+        """
+        for monom in self.monoms:
+            multiplication = monom.multiply(multiplier)
+            self.monoms.remove(monom)
+            self.monoms.append(multiplication)
+
+    def __pow__(self, power, modulo=None):
+        """
+        gets other scalar in type of Polynom, Monom or int
+        returns Polynom, which is a power
         """
         raise NotImplemented()
 
     def __str__(self):
-        raise NotImplemented()
-
-a = Polynom()
-b = Polynom()
-print(a + b)
+        monoms_in_brackets = map(lambda monom:
+                                 "(" + str(monom) + ")" if monom.scalar < 0 else str(monom),
+                                 self.monoms)
+        result = " + ".join(monoms_in_brackets)
+        return result

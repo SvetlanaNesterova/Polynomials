@@ -15,7 +15,9 @@ class TestPolynom(unittest.TestCase):
         self.assertEqual(str(pol), "x*y + a")
     '''
     def test_scalars_sum(self):
-        result = Polynom("50") + Polynom("-123")
+        a = Polynom("50")
+        b = Polynom("-123")
+        result = a + b
         self.assertEqual(str(result), "-73")
 
     def test_scalar_sums_with_first_degree_monom(self):
