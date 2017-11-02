@@ -35,11 +35,17 @@ class Polynom:
         """
         for monom in self.monoms:
             if monom.is_simular_monom(additional):
-                summa = monom.add(additional)
-                self.monoms.remove(monom)
-                self.monoms.append(summa)
+                monom.scalar = monom.scalar + additional.scalar
+                if monom.scalar == 0:
+                    monom.multiply(0)
                 return
         self.monoms.append(additional)
+        self.clear_zeroes()
+
+    def clear_zeroes(self):
+        for monom in self.monoms:
+            if monom.scalar == 0:
+                self.monoms.remove(monom)
 
     def __mul__(self, other):
         """
@@ -73,14 +79,17 @@ class Polynom:
 
     def __pow__(self, power, modulo=None):
         """
-        gets other scalar in type of Polynom, Monom or int
+        gets other SCALAR in type of Polynom, Monom or int
         returns Polynom, which is a power
         """
         raise NotImplemented()
 
     def __str__(self):
+        self.monoms.sort(reverse=True)
         monoms_in_brackets = map(lambda monom:
                                  "(" + str(monom) + ")" if monom.scalar < 0 else str(monom),
                                  self.monoms)
         result = " + ".join(monoms_in_brackets)
+        if result == "":
+            return "0"
         return result

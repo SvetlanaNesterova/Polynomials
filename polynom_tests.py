@@ -18,7 +18,7 @@ class TestPolynom(unittest.TestCase):
         a = Polynom("50")
         b = Polynom("-123")
         result = a + b
-        self.assertEqual(str(result), "-73")
+        self.assertEqual(str(result), "(-73)")
 
     def test_scalar_sums_with_first_degree_monom(self):
         result = Polynom("128") + Polynom("7*x")
@@ -34,7 +34,7 @@ class TestPolynom(unittest.TestCase):
 
     def test_simple_sum(self):
         result = Polynom("a + b + c + d") + Polynom("x*y + z")
-        self.assertEqual(str(result), "a + b + c + d + x*y + z")
+        self.assertEqual(str(result), "x*y + a + b + c + d + z")
 
     def test_two_zero_sum(self):
         result = Polynom("0") + Polynom("0")
@@ -54,13 +54,14 @@ class TestPolynom(unittest.TestCase):
         self.assertEqual(str(result), "0")
 
     def test_communicativity_simple(self):
-        self.test_communicativity("a", "b")
+        self.help_test_communicativity("a", "b")
 
     def test_commutativity_complex(self):
         source1 = "10*x^6 + 200*y^5 + x^3*y^2 + t*z^4 + a + b + n + 123456"
         source2 = "s^7*t*3 - 4*x^6 - 3*x^3*y^2 + z^4 + a - 7"
+        self.help_test_communicativity(source1, source2)
 
-    def test_communicativity(self, source1, source2):
+    def help_test_communicativity(self, source1, source2):
         pol1 = Polynom(source1)
         pol2 = Polynom(source2)
         first_result = pol1 + pol2

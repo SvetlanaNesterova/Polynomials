@@ -1,4 +1,4 @@
-import polynomial
+import polynom
 from monom import Monom
 
 operators = ['+', '-', '*', '^']
@@ -170,7 +170,7 @@ class Parser:
         postfix = self.to_postfix(lexemes_sequence)
         to_polynomials(postfix)
         result_polynomial = self.calculate_from_postfix_polynomial_sequence(postfix)
-        return result_polynomial
+        return result_polynomial.monoms
 
     def to_postfix(self, seq):
         priority = {'(': 0, '+': 1, '-': 1, '*': 2, '^': 3}
@@ -208,7 +208,7 @@ class Parser:
             if elem in operators:
                 operand2 = stack.pop()
                 operand1 = stack.pop()
-                result = self.calculate(operand1, operand2, elem)
+                result = calculate(operand1, operand2, elem)
                 stack.append(result)
             else:
                 stack.append(elem)

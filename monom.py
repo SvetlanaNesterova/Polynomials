@@ -1,14 +1,22 @@
 def is_a_number(value):
     try:
         n = int(value)
-        return True
+        if str(n) == value:
+            return True
     except:
-        return False
+        pass
+    return False
 
 class Monom:
     def __init__(self):
         self.multipliers_powers = dict()
         self.scalar = 1
+
+    def get_degree(self):
+        degree = 0
+        for power in self.multipliers_powers.values():
+            degree += power
+        return degree
 
     #add multiply on str scalar
     #
@@ -45,6 +53,17 @@ class Monom:
             return True
         return False
 
+    def __lt__(self, other):
+        if self.get_degree() < other.get_degree():
+            return  True
+        elif self.get_degree() > other.get_degree():
+            return False
+        else:
+            if self.comp_str() < other.comp_str():
+                return False
+            else:
+                return True
+
     def is_simular_monom(self, other):
         keys1 = list(self.multipliers_powers.keys())
         keys2 = list(other.multipliers_powers.keys())
@@ -71,7 +90,11 @@ class Monom:
             result += "-"
         elif self.scalar != 1:
             result += str(self.scalar) + "*"
+        result += self.str_without_scalar()
+        return result
 
+    def str_without_scalar(self):
+        result = ""
         keys = list(self.multipliers_powers.keys())
         keys.sort()
         for multiplier in keys:
@@ -83,6 +106,16 @@ class Monom:
                 else:
                     result += "^(" + str(power) + ")"
             result += "*"
-        result = result[:-1]
+        return result[:-1]
 
+    def comp_str(self):
+        result = ""
+        keys = list(self.multipliers_powers.keys())
+        keys.sort()
+        for multiplier in keys:
+            power = self.multipliers_powers[multiplier]
+            mul_str = str(multiplier)
+            if power > 0:
+                result += mul_str.replace(mul_str, mul_str, power)
         return result
+
