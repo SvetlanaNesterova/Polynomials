@@ -38,8 +38,9 @@ class Polynom:
                 monom.scalar = monom.scalar + additional.scalar
                 if monom.scalar == 0:
                     monom.multiply(0)
-                return
-        self.monoms.append(additional)
+                break
+        else:
+            self.monoms.append(additional)
         self.clear_zeroes()
 
     def clear_zeroes(self):
@@ -82,7 +83,21 @@ class Polynom:
         gets other SCALAR in type of Polynom, Monom or int
         returns Polynom, which is a power
         """
-        raise NotImplemented()
+        return self._in_scalar_power(power.monoms[0].scalar)
+
+    def _in_scalar_power(self, power):
+        if type(power) is not int:
+            raise TypeError("Polynomial can be only in scalar power")
+        if power < 0:
+            raise ValueError("Polynomial can't be in negative power")
+        if power == 0:
+            return Polynom("1")
+        if power == 1:
+            return copy.deepcopy(self)
+        result = self * self
+        for p in range(3, power + 1):
+            result *= self
+        return result
 
     def __str__(self):
         self.monoms.sort(reverse=True)

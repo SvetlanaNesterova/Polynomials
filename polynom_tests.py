@@ -5,7 +5,7 @@ class TestPolynom(unittest.TestCase):
     def test_polynom_to_str_sorts_monoms_in_classical_order(self):
         pol = Polynom("a + 123456 + x^2 + x*y + y*x*z")
         self.assertEqual(str(pol), "x*y*z + x^2 + x*y + a + 123456")
-    '''
+
     def test_polynom_to_str_scalar_has_lowerest_degree(self):
         pol = Polynom("1000 + x")
         self.assertEqual(str(pol), "x + 1000")
@@ -13,7 +13,7 @@ class TestPolynom(unittest.TestCase):
     def test_polynom_to_str_sorts_three_var_monoms_in_degree_decrease_order(self):
         pol = Polynom("a+x*y")
         self.assertEqual(str(pol), "x*y + a")
-    '''
+
     def test_scalars_sum(self):
         a = Polynom("50")
         b = Polynom("-123")
@@ -30,7 +30,7 @@ class TestPolynom(unittest.TestCase):
 
     def test_many_same_addents_reduction(self):
         result = Polynom("10*x^6 - y^5 + x^3*y^2 + t*z^4") + Polynom("x^6 - 8*y^5 - 10*x^3*y^2 + t*z^4")
-        self.assertEqual(str(result), "11*x^6 - 9*y^5 - 9*x^3*y^2 + 2*t*z^4")
+        self.assertEqual(str(result), "11*x^6 + 2*t*z^4 + (-9*x^3*y^2) + (-9*y^5)")
 
     def test_simple_sum(self):
         result = Polynom("a + b + c + d") + Polynom("x*y + z")
@@ -50,7 +50,9 @@ class TestPolynom(unittest.TestCase):
         self.assertEqual(str(result), "0")
 
     def test_all_reduct_complex(self):
-        result = Polynom("s^7*t*3 - u*v") + Polynom("-s^7*t*3 + u*v")
+        a = Polynom("s^7*t*3 - u*v")
+        b = Polynom("-s^7*t*3 + u*v")
+        result = a + b
         self.assertEqual(str(result), "0")
 
     def test_communicativity_simple(self):
@@ -67,3 +69,27 @@ class TestPolynom(unittest.TestCase):
         first_result = pol1 + pol2
         second_result = pol2 + pol1
         self.assertEqual(str(first_result), str(second_result))
+
+    def test_two_variables_multiplication(self):
+        a = Polynom("a")
+        b = Polynom("b")
+        result = a * b
+        self.assertEqual(str(result), "a*b")
+
+    def test_multiplication_on_zero(self):
+        a = Polynom("a+b")
+        b = Polynom("0")
+        result = a * b
+        self.assertEqual(str(result), "0")
+
+    def test_two_scalar_and_variable_multiplication_with_short_form(self):
+        a = Polynom("2a")
+        b = Polynom("4b")
+        result = a * b
+        self.assertEqual(str(result), "8*a*b")
+
+    def test_two_polynoms_multiplication(self):
+        a = Polynom("a + b")
+        b = Polynom("c + d")
+        result = a * b
+        self.assertEqual(str(result), "a*c + a*d + b*c + b*d")

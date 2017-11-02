@@ -201,7 +201,6 @@ class Parser:
             result.append(stack.pop())
         return result
 
-
     def calculate_from_postfix_polynomial_sequence(self, seq):
         stack = []
         for elem in seq:
