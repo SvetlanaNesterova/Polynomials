@@ -112,3 +112,18 @@ class Polynom:
         if result == "":
             return "0"
         return result
+
+    def __eq__(self, other):
+        if type(other) is not Polynom:
+            return False
+        if len(self.monoms) != len(other.monoms):
+            return False
+        self.monoms.sort()
+        other.monoms.sort()
+
+        for a,b in zip(self.monoms, other.monoms):
+            if a != b:
+                return False
+        return True
+
+

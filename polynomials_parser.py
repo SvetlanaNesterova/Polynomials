@@ -157,7 +157,7 @@ def calculate(operand1, operand2, operation):
 class Parser:
     def parse(self, source):
         """
-            Returns Polynom
+        Returns list of Monoms
         """
         if type(source) != str:
             raise TypeError("Source should be a string.")

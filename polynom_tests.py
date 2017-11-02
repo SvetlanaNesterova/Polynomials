@@ -117,3 +117,9 @@ class TestPolynom(unittest.TestCase):
     def test_square_substraction(self):
         a = Polynom("(a - b)(a + b)")
         self.assertEqual(str(a), "a^2 + (-b^2)")
+
+    def test_equality(self):
+        a = Polynom("(x^2-y^2)(a+b)^2")
+        b = Polynom("(x-y)(a+b)(x+y)(a+b)")
+        self.assertTrue(a == b)
+
