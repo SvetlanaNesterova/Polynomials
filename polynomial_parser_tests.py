@@ -1,18 +1,16 @@
 import unittest
-import polynomials_parser
+from polynomial_parser import Parser
 
 
 class TestPolynom(unittest.TestCase):
-    def setUp(self):
-        self.parser = polynomials_parser.Parser()
-
     def test_brackets(self):
-        self.assertTrue(polynomials_parser.contains_correct_bracket_sequence("()"))
-        self.assertTrue(polynomials_parser.contains_correct_bracket_sequence("(()(()()))()(())"))
+        self.assertTrue(Parser._contains_correct_bracket_sequence("()"))
+        self.assertTrue(Parser._contains_correct_bracket_sequence(
+            "(()(()()))()(())"))
 
-        self.assertFalse(polynomials_parser.contains_correct_bracket_sequence("(()"))
-        self.assertFalse(polynomials_parser.contains_correct_bracket_sequence("())"))
-        self.assertFalse(polynomials_parser.contains_correct_bracket_sequence(")("))
+        self.assertFalse(Parser._contains_correct_bracket_sequence("(()"))
+        self.assertFalse(Parser._contains_correct_bracket_sequence("())"))
+        self.assertFalse(Parser._contains_correct_bracket_sequence(")("))
 
     def test_form_lexemes(self):
         values = []
@@ -22,6 +20,9 @@ class TestPolynom(unittest.TestCase):
 
         values.append("-10")
         results.append(['-1', '*', '10'])
+
+        values.append("1.05")
+        results.append(['1.05'])
 
         values.append("200^345")
         results.append(['200', '^', '345'])
@@ -42,13 +43,15 @@ class TestPolynom(unittest.TestCase):
         results.append(['-1', '*', '(', 'x', '-', 'y', ')'])
 
         values.append("(xy)(-x*-y)")
-        results.append(['(', 'x', '*', 'y', ')', '*', '(', '-1', '*', 'x', '*', '-1', '*', 'y', ')'])
+        results.append(['(', 'x', '*', 'y', ')', '*', '(', '-1',
+                        '*', 'x', '*', '-1', '*', 'y', ')'])
 
         values.append("(-(-(-2)))")
-        results.append(['(', '-1', '*', '(', '-1', '*', '(', '-1', '*', '2', ')', ')', ')'])
+        results.append(['(', '-1', '*', '(', '-1', '*', '(', '-1',
+                        '*', '2', ')', ')', ')'])
 
         for val, expected in zip(values, results):
-            actual = polynomials_parser.form_lexemes(val)
+            actual = Parser._form_lexemes(val)
             self.assertListEqual(expected, actual)
 
     def test_to_postfix(self):
@@ -86,7 +89,7 @@ class TestPolynom(unittest.TestCase):
         results.append(['x', 'y', '-', 'x', 'y', '^', '*'])
 
         for val, expected in zip(values, results):
-            actual = self.parser.to_postfix(val)
+            actual = Parser._to_postfix(val)
             self.assertListEqual(expected, actual)
 
     def test_simple_single_monoms_parse(self):
@@ -105,6 +108,6 @@ class TestPolynom(unittest.TestCase):
             "15*a^3*b^2*c",
         ]
         for source in values:
-            monoms = self.parser.parse(source)
-            monom = monoms[0]
+            monomials = Parser.parse(source)
+            monom = monomials[0]
             self.assertEqual(str(monom), source)

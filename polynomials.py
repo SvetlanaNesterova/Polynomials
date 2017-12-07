@@ -1,29 +1,30 @@
-import polynomials_parser
+import polynomial_parser
 import copy
-from monom import Monom
+from monomial import Monomial
 
-class Polynom:
+
+class Polynomials:
     def __init__(self, source):
         if type(source) != str:
             raise TypeError("Source should be a string.")
-        self.monoms = polynomials_parser.Parser().parse(source)
+        self.monomials = polynomial_parser.Parser.parse(source)
 
     def __add__(self, other):
         """
-        gets other Polynom, Monom, or scalar
-        returns Polynom, which is a result of summation
+        gets other Polynomial, Monomial, or scalar
+        returns Polynomial, which is a result of summation
         """
-        result = Polynom("")
-        result.monoms = copy.deepcopy(self.monoms)
+        result = Polynomials("")
+        result.monomials = copy.deepcopy(self.monomials)
 
-        if type(other) == Polynom:
-            for monom in other.monoms:
+        if type(other) == Polynomials:
+            for monom in other.monomials:
                 result._add_monom(monom)
-        elif type(other) == Monom:
+        elif type(other) == Monomial:
             result._add_monom(other)
         elif type(other) == int:
-            additional = Monom()
-            additional.multiply(other)
+            additional = Monomial()
+            additional.mul(other)
             result._add_monom(additional)
         else:
             raise TypeError("Additional should be Polynom, Monom, or int")
@@ -33,41 +34,41 @@ class Polynom:
         """
         This method spoils self
         """
-        for monom in self.monoms:
-            if monom.is_simular_monom(additional):
+        for monom in self.monomials:
+            if monom.is_similar_monomial(additional):
                 monom.scalar = monom.scalar + additional.scalar
                 if monom.scalar == 0:
-                    monom.multiply(0)
+                    monom.mul(0)
                 break
         else:
-            self.monoms.append(additional)
+            self.monomials.append(additional)
         self.clear_zeroes()
 
     def clear_zeroes(self):
-        for monom in self.monoms:
+        for monom in self.monomials:
             if monom.scalar == 0:
-                self.monoms.remove(monom)
+                self.monomials.remove(monom)
 
     def __mul__(self, other):
         """
         gets other Polynom, Monom or scalar
         returns Polynom, which is a result of multiplication
         """
-        result = Polynom("")
+        result = Polynomials("")
 
-        if type(other) == Polynom:
-            for monom in other.monoms:
-                multiplier = Polynom("")
-                multiplier.monoms = copy.deepcopy(self.monoms)
+        if type(other) == Polynomials:
+            for monom in other.monomials:
+                multiplier = Polynomials("")
+                multiplier.monomials = copy.deepcopy(self.monomials)
                 multiplier._mul_on_monom(monom)
                 result += multiplier
         else:
-            result.monoms = copy.deepcopy(self.monoms)
-            if type(other) == Monom:
+            result.monomials = copy.deepcopy(self.monomials)
+            if type(other) == Monomial:
                 result._mul_on_monom(other)
             elif type(other) == int:
-                multiplier = Monom()
-                multiplier.multiply(other)
+                multiplier = Monomial()
+                multiplier.mul(other)
                 result._mul_on_monom(multiplier)
             else:
                 raise TypeError("Multiplier should be Polynom, Monom, or int")
@@ -77,17 +78,17 @@ class Polynom:
         """
         This method spoils self
         """
-        for monom in self.monoms:
-            multiplication = monom.multiply(multiplier)
-            #self.monoms.remove(monom)
-            #self.monoms.append(multiplication)
+        for monom in self.monomials:
+            multiplication = monom.mul(multiplier)
+            # self.monomials.remove(monom)
+            # self.monomials.append(multiplication)
 
     def __pow__(self, power, modulo=None):
         """
         gets other SCALAR in type of Polynom, Monom or int
         returns Polynom, which is a power
         """
-        return self._in_scalar_power(power.monoms[0].scalar)
+        return self._in_scalar_power(power.monomials[0].scalar)
 
     def _in_scalar_power(self, power):
         if type(power) is not int:
@@ -95,7 +96,7 @@ class Polynom:
         if power < 0:
             raise ValueError("Polynomial can't be in negative power")
         if power == 0:
-            return Polynom("1")
+            return Polynomials("1")
         if power == 1:
             return copy.deepcopy(self)
         result = self * self
@@ -104,26 +105,25 @@ class Polynom:
         return result
 
     def __str__(self):
-        self.monoms.sort(reverse=True)
-        monoms_in_brackets = map(lambda monom:
-                                 "(" + str(monom) + ")" if monom.scalar < 0 else str(monom),
-                                 self.monoms)
-        result = " + ".join(monoms_in_brackets)
+        self.monomials.sort(reverse=True)
+        monomials_in_brackets = map(
+            lambda monom:
+            "(" + str(monom) + ")" if monom.scalar < 0 else str(monom),
+            self.monomials)
+        result = " + ".join(monomials_in_brackets)
         if result == "":
             return "0"
         return result
 
     def __eq__(self, other):
-        if type(other) is not Polynom:
+        if type(other) is not Polynomials:
             return False
-        if len(self.monoms) != len(other.monoms):
+        if len(self.monomials) != len(other.monomials):
             return False
-        self.monoms.sort()
-        other.monoms.sort()
+        self.monomials.sort()
+        other.monomials.sort()
 
-        for a,b in zip(self.monoms, other.monoms):
+        for a, b in zip(self.monomials, other.monomials):
             if a != b:
                 return False
         return True
-
-
