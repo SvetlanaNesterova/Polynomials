@@ -13,6 +13,7 @@ class TestPolynom(unittest.TestCase):
         self.assertFalse(Parser._contains_correct_bracket_sequence(")("))
 
     def test_form_lexemes(self):
+        """Expression should be without spaces"""
         values = []
         results = []
         values.append("1+a")
@@ -27,11 +28,20 @@ class TestPolynom(unittest.TestCase):
         values.append("200^345")
         results.append(['200', '^', '345'])
 
+        values.append("0.9*12.33/0.05")
+        results.append(['0.9', '*', '12.33', '/', '0.05'])
+
         values.append("a*(b+c)")
         results.append(['a', '*', '(', 'b', '+', 'c', ')'])
 
+        values.append("(b+c)/12")
+        results.append(['(', 'b', '+', 'c', ')', '/', '12'])
+
         values.append("(x-b)*-2")
         results.append(['(', 'x', '-', 'b', ')', '*', '-1', '*', '2'])
+
+        values.append("a/-8.9")
+        results.append(['a', '/', '-1', '/', '8.9' ])
 
         values.append("ac")
         results.append(['a', '*', 'c'])
