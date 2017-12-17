@@ -39,6 +39,18 @@ python polynomials.py -e (x+y)^100 -a (y+x)^100
 При запуске из консоли не забывайте экранировать знак ^.
 
 ЗАПУСК ТЕСТОВ
-coverage run -m unittest monomial_tests.py
-coverage run -m unittest polynomial_parser_tests.py
-coverage run -m unittest polynomial_tests.py
+coverage run -m unittest polynomial_tests.py monomial_tests.py polynomial_parser_tests.py
+
+Результаты тестирования
+Name                         Stmts   Miss  Cover
+------------------------------------------------
+monomial.py                    104      0   100%
+monomial_tests.py              277      1    99%
+polynomial.py                  108      3    97%
+polynomial_parser.py           187     13    93%
+polynomial_parser_tests.py      97      1    99%
+polynomial_tests.py            153      1    99%
+------------------------------------------------
+TOTAL                          926     19    98%
+
+
