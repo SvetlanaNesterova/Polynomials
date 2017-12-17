@@ -32,12 +32,13 @@ Python версии 3
 Справка по запуску: python polynomials.py --help
 
 Пример запуска:
-python polynomials.py --equals (x+y)(x-y) --and x^^2 - y*y
 python polynomials.py --simplify (a+b)^^10
+python polynomials.py --equals (x+y)(x-y) --and x^^2 - y*y
+Более коротко:
+python polynomials.py -e (x+y)^100 -a (y+x)^100
 При запуске из консоли не забывайте экранировать знак ^.
 
 ЗАПУСК ТЕСТОВ
 coverage run -m unittest monomial_tests.py
 coverage run -m unittest polynomial_parser_tests.py
 coverage run -m unittest polynomial_tests.py
-
