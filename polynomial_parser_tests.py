@@ -1,8 +1,10 @@
 import unittest
 from polynomial_parser import Parser
 
+if __name__ == "__main__":
+    unittest.main()
 
-class TestPolynom(unittest.TestCase):
+class TestPolynomial(unittest.TestCase):
     def test_brackets(self):
         self.assertTrue(Parser._contains_correct_bracket_sequence("()"))
         self.assertTrue(Parser._contains_correct_bracket_sequence(
@@ -11,6 +13,9 @@ class TestPolynom(unittest.TestCase):
         self.assertFalse(Parser._contains_correct_bracket_sequence("(()"))
         self.assertFalse(Parser._contains_correct_bracket_sequence("())"))
         self.assertFalse(Parser._contains_correct_bracket_sequence(")("))
+
+        self.assertRaises(ValueError, Parser.parse, ")(")
+
 
     def test_form_lexemes(self):
         """Expression should be without spaces"""
@@ -28,8 +33,14 @@ class TestPolynom(unittest.TestCase):
         values.append("200^345")
         results.append(['200', '^', '345'])
 
+        values.append("20^-345")
+        results.append(['20', '^', '-1', '^', '345'])
+
         values.append("0.9*12.33/0.05")
         results.append(['0.9', '*', '12.33', '/', '0.05'])
+
+        values.append("a/-8.9")
+        results.append(['a', '/', '-1', '/', '8.9'])
 
         values.append("a*(b+c)")
         results.append(['a', '*', '(', 'b', '+', 'c', ')'])
@@ -40,11 +51,20 @@ class TestPolynom(unittest.TestCase):
         values.append("(x-b)*-2")
         results.append(['(', 'x', '-', 'b', ')', '*', '-1', '*', '2'])
 
-        values.append("a/-8.9")
-        results.append(['a', '/', '-1', '/', '8.9' ])
-
         values.append("ac")
         results.append(['a', '*', 'c'])
+
+        values.append("a^b^c")
+        results.append(['a', '^', 'b', '^', 'c'])
+
+        values.append("a/b/c")
+        results.append(['a', '/', 'b', '/', 'c'])
+
+        values.append("a^-b^-c")
+        results.append(['a', '^', '-1', '^', 'b', '^', '-1', '^', 'c'])
+
+        values.append("a/-b/-c")
+        results.append(['a', '/', '-1', '/', 'b', '/', '-1',  '/', 'c'])
 
         values.append("x-(x-y)")
         results.append(['x', '-', '(', 'x', '-', 'y', ')'])
@@ -89,6 +109,9 @@ class TestPolynom(unittest.TestCase):
         values.append(['a', '*', 'c', '*', 'b'])
         results.append(['a', 'c', '*', 'b', '*'])
 
+        values.append(['a', '/', 'c', '/', 'b'])
+        results.append(['a', 'c', '/', 'b', '/'])
+
         values.append(['x', '-', '(', 'x', '-', 'y', ')'])
         results.append(['x', 'x', 'y', '-', '-'])
 
@@ -102,7 +125,7 @@ class TestPolynom(unittest.TestCase):
             actual = Parser._to_postfix(val)
             self.assertListEqual(expected, actual)
 
-    def test_simple_single_monoms_parse(self):
+    def test_simple_single_monomials_parse(self):
         values = [
             "1",
             "100",
@@ -119,5 +142,25 @@ class TestPolynom(unittest.TestCase):
         ]
         for source in values:
             monomials = Parser.parse(source)
-            monom = monomials[0]
-            self.assertEqual(str(monom), source)
+            monomial = monomials[0]
+            self.assertEqual(str(monomial), source)
+
+    def test_simple_polynomials_parse(self):
+        values = [
+            "a*b*c + a*b*c",
+            "2abc",
+            "a^2b^2+b^2*a^2",
+            "acc-3c^2*a",
+            "a^3/a^5"
+        ]
+        results = [
+            "2*a*b*c",
+            "2*a*b*c",
+            "2*a^2*b^2",
+            "-2*a*c^2",
+            "a^(-2)"
+        ]
+        for source, result in zip(values, results):
+            monomials = Parser.parse(source)
+            monomial = monomials[0]
+            self.assertEqual(str(monomial), result)

@@ -1,6 +1,9 @@
 from monomial import Monomial
 import unittest
 
+if __name__ == "__main__":
+    unittest.main()
+
 
 class TestMonomialStr(unittest.TestCase):
     def setUp(self):
@@ -246,14 +249,40 @@ class TestMonomialEquality(unittest.TestCase):
         self.b.mul("x", 8)
         self.assertEqual(self.a, self.b)
 
-    def test_equal_monoms_of_two_variables(self):
+    def test_equal_one_variable_monomial_inversion(self):
+        self.a.mul("x")
+        self.b.mul("x", -1)
+        self.a.invert()
+        self.assertEqual(self.a, self.b)
+
+    def test_equal_many_variables_monomial_inversion(self):
+        self.a.mul("x")
+        self.b.mul("x", -1)
+        self.a.mul("z", 10)
+        self.b.mul("z", -10)
+        self.a.mul("y", -2)
+        self.b.mul("y", 2)
+        self.a.invert()
+        self.assertEqual(self.a, self.b)
+
+    def test_equal_scalar_and_two_variables_monomial_inversion(self):
+        self.a.mul("100")
+        self.b.mul(0.01)
+        self.a.mul("a")
+        self.b.mul("a", -1)
+        self.a.mul("b", -1)
+        self.b.mul("b")
+        self.a.invert()
+        self.assertEqual(self.a, self.b)
+
+    def test_equal_monomials_of_two_variables(self):
         self.a.mul("z")
         self.b.mul("z")
         self.a.mul("x")
         self.b.mul("x")
         self.assertEqual(self.a, self.b)
 
-    def test_equal_monoms_of_two_variables_in_powers(self):
+    def test_equal_monomials_of_two_variables_in_powers(self):
         self.a.mul("z", 2)
         self.b.mul("z", 2)
         self.a.mul("x", 10)
@@ -293,3 +322,20 @@ class TestMonomialEquality(unittest.TestCase):
         self.a.mul("y", -4)
         self.a.mul("t", 2)
         self.assertNotEqual(self.a, {"t": 2, "x": 10, "y": -4})
+
+    def test_monomials_compare_with_degree(self):
+        self.a.mul("x", 10)
+        self.a.mul("y", 5)
+        self.b.mul("x", 10)
+        self.b.mul("y", 4)
+        self.assertLess(self.b, self.a)
+
+    def test_if_degree_are_equal_compares_alphabetically(self):
+        self.a.mul("a")
+        self.a.mul("b", 5)
+        self.b.mul("x", 2)
+        self.b.mul("y", 4)
+        self.assertLess(self.b, self.a)
+
+    def test_mul_on_incorrect_raises_type_error(self):
+        self.assertRaises(TypeError, self.a.mul, ["a"])

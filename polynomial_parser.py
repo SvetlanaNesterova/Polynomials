@@ -1,10 +1,10 @@
-import polynomials
+import polynomial
 from monomial import Monomial
 
-operators = ['+', '-', '*', '^', '/']
-letters = [chr(c) for c in range(ord('a'), ord('z') + 1)] + \
+OPERATORS = ['+', '-', '*', '^', '/']
+LETTERS = [chr(c) for c in range(ord('a'), ord('z') + 1)] + \
           [chr(c) for c in range(ord('A'), ord('Z') + 1)]
-digits = [chr(c) for c in range(ord('0'), ord('9') + 1)]
+DIGITS = [chr(c) for c in range(ord('0'), ord('9') + 1)]
 
 
 class Parser:
@@ -13,7 +13,7 @@ class Parser:
         """
         Returns list of Monoms
         """
-        if type(source) != str:
+        if not isinstance(source, str):
             raise TypeError("Source should be a string.")
         source = Parser._remove_spaces(source)
         if source == "":
@@ -45,14 +45,14 @@ class Parser:
 
     @staticmethod
     def _to_polynomials(seq):
-        polynomials = []
-        for index in range(len(seq)):
-            if not seq[index] in operators:
-                polynomials.append(
-                    Parser._to_polynomial_from_monomial_str(seq[index]))
+        polynoms = []
+        for elem in seq:
+            if elem not in OPERATORS:
+                polynoms.append(
+                    Parser._to_polynomial_from_monomial_str(elem))
             else:
-                polynomials.append(seq[index])
-        return polynomials
+                polynoms.append(elem)
+        return polynoms
 
     @staticmethod
     def _to_polynomial_from_monomial_str(value):
@@ -61,24 +61,26 @@ class Parser:
             monomial.mul(-1)
             value = value[1:]
         monomial.mul(value)
-        polynomial = polynomials.Polynomials("")
-        polynomial += monomial
-        return polynomial
+        polynom = polynomial.Polynomial("")
+        polynom.add(monomial)
+        return polynom
 
     @staticmethod
     def _form_lexemes(source):
         lexemes = []
         number = ""
         state = 0
+        symb_before = ''
+        symb_twice_before = ''
         for symb in source:
             if state == 0:
-                if symb in digits:
+                if symb in DIGITS:
                     number += symb
                     state = 2
                 elif symb == "-":
                     state = 4
                 else:
-                    if symb in letters:
+                    if symb in LETTERS:
                         state = 3
                     elif symb == "(":
                         state = 1
@@ -86,13 +88,13 @@ class Parser:
                         state = 5
                     lexemes.append(symb)
             elif state == 1:
-                if symb in digits:
+                if symb in DIGITS:
                     number += symb
                     state = 2
                 elif symb == "-":
                     state = 4
                 else:
-                    if symb in letters or symb == ")":
+                    if symb in LETTERS or symb == ")":
                         state = 3
                     elif symb == "(":
                         state = 1
@@ -100,15 +102,15 @@ class Parser:
                         state = 5
                     lexemes.append(symb)
             elif state == 2:
-                if symb in digits or symb == '.':
+                if symb in DIGITS or symb == '.':
                     number += symb
                     state = 2
                 else:
                     lexemes.append(number)
                     number = ""
-                    if symb in operators:
+                    if symb in OPERATORS:
                         state = 0
-                    elif symb in letters:
+                    elif symb in LETTERS:
                         lexemes.append("*")
                         state = 3
                     elif symb == ")":
@@ -120,14 +122,14 @@ class Parser:
                         state = 5
                     lexemes.append(symb)
             elif state == 3:
-                if symb in digits:
+                if symb in DIGITS:
                     lexemes.append("*")
                     number += symb
                     state = 2
                 else:
-                    if symb in operators:
+                    if symb in OPERATORS:
                         state = 0
-                    elif symb in letters:
+                    elif symb in LETTERS:
                         lexemes.append("*")
                         state = 3
                     elif symb == ")":
@@ -140,14 +142,19 @@ class Parser:
                     lexemes.append(symb)
             elif state == 4:
                 lexemes.append("-1")
-                lexemes.append("*")
-                if symb in digits:
+                if symb_twice_before == '/':
+                    lexemes.append('/')
+                elif symb_twice_before == '^':
+                    lexemes.append('^')
+                else:
+                    lexemes.append("*")
+                if symb in DIGITS:
                     number += symb
                     state = 2
                 elif symb == "-":
                     state = 4
                 else:
-                    if symb in letters:
+                    if symb in LETTERS:
                         state = 3
                     elif symb == '(':
                         state = 1
@@ -155,7 +162,9 @@ class Parser:
                         state = 5
                     lexemes.append(symb)
             if state == 5:
-                raise SyntaxError("Unknown symbol: " + symb + ".")
+                raise SyntaxError("Incorrect symbol: " + symb + ".")
+            symb_twice_before = symb_before
+            symb_before = symb
 
         if number != "":
             lexemes.append(number)
@@ -163,19 +172,32 @@ class Parser:
 
     @staticmethod
     def _to_postfix(seq):
-        priority = {'(': 0, '+': 1, '-': 1, '*': 2, '/': 2, '^': 3}
-        left_associativity = {'+': True, '-': True, '*': True, '/': True, '^': False}
+        priority = {
+            '(': 0,
+            '+': 1,
+            '-': 1,
+            '*': 2,
+            '/': 2,
+            '^': 3
+        }
+        left_associativity = {
+            '+': True,
+            '-': True,
+            '*': True,
+            '/': True,
+            '^': False
+        }
         stack = []
         result = []
         for elem in seq:
-            if elem in operators:
-                while len(stack) > 0:
+            if elem in OPERATORS:
+                while stack:
                     cur = stack.pop()
                     if (priority[cur] >= priority[elem] and
                             left_associativity[elem]) or (
                         priority[cur] > priority[elem]) and \
                             not left_associativity[elem]:
-                            result.append(cur)
+                        result.append(cur)
                     else:
                         stack.append(cur)
                         break
@@ -189,7 +211,7 @@ class Parser:
                     cur = stack.pop()
             else:
                 result.append(elem)
-        while len(stack) > 0:
+        while stack:
             result.append(stack.pop())
         return result
 
@@ -197,7 +219,7 @@ class Parser:
     def _calculate_from_postfix_polynomial_sequence(seq):
         stack = []
         for elem in seq:
-            if elem in operators:
+            if elem in OPERATORS:
                 operand2 = stack.pop()
                 operand1 = stack[-1]
                 Parser._calculate_to_first(operand1, operand2, elem)
@@ -210,15 +232,15 @@ class Parser:
         if operator == '+':
             operand1.add(operand2)
         elif operator == '-':
-            operand1.multiply(-1)
+            operand1.mul(-1)
             operand1.add(operand2)
-            operand1.multiply(-1)
+            operand1.mul(-1)
         elif operator == '*':
-            operand1.multiply(operand2)
+            operand1.mul(operand2)
         elif operator == '/':
             operand2.invert()
-            operand1.multiply(operand2)
+            operand1.mul(operand2)
         elif operator == '^':
-            operand1.in_power(operand2)
+            operand1.pow(operand2)
         else:
             raise Exception("Unknown or unhandled operator: " + operator)

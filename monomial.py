@@ -1,14 +1,14 @@
-eps = 1e-10
+EPS = 1e-10
 
 
 def try_as_a_number(value):
     """
     If value is int/flout or string representation of int/float number,
-    returns this int/float number, else returns None.
+    returns this int/float number, else returns None
     """
-    if type(value) == int or type(value) == float:
+    if isinstance(value, (int, float)):
         return value
-    elif type(value) != str:
+    elif not isinstance(value, str):
         return None
     try:
         return int(value)
@@ -20,18 +20,18 @@ def try_as_a_number(value):
 
 
 def is_almost_equal_scalars(first, second):
-    """Compares to float numbers with inaccuracy."""
-    return abs(first - second) < eps
+    """Compares to float numbers with inaccuracy"""
+    return abs(first - second) < EPS
 
 
 class Monomial:
     def __init__(self):
-        """Creation of monomial with value 1."""
+        """Creation of monomial with value 1"""
         self.multipliers_powers = dict()
         self.scalar = 1
 
     def get_degree(self):
-        """Returns degree of monomial (sum of multipliers degrees)."""
+        """Returns degree of monomial (sum of multipliers degrees)"""
         degree = sum(self.multipliers_powers.values())
         return degree
 
@@ -42,14 +42,15 @@ class Monomial:
         number = try_as_a_number(multiplier)
         if number is not None:
             self.scalar *= number ** count
-        elif type(multiplier) is str:
+        elif isinstance(multiplier, str):
             self._multiply_on_var(multiplier, count)
-        elif type(multiplier) is Monomial:
+        elif isinstance(multiplier, Monomial):
             self._multiply_on_monomial(multiplier, count)
         else:
-            raise TypeError("Multiplier should be a variable (str type), " +
-                            "number (float or int type) or Monomial.")
-        return self
+            raise TypeError("Multiplier should be a variable (str type), "
+                            "number (float or int type) or Monomial, "
+                            "but it is" + str(type(multiplier)) + ": " +
+                            str(multiplier))
 
     def _multiply_on_var(self, multiplier, count):
         powers = self.multipliers_powers
@@ -64,6 +65,13 @@ class Monomial:
         for var, power in multiplier.multipliers_powers.items():
             self._multiply_on_var(var, power)
 
+    def invert(self):
+        """
+        """
+        self.scalar = 1 / self.scalar
+        for multiplier in self.multipliers_powers.keys():
+            self.multipliers_powers[multiplier] *= -1
+
     def __eq__(self, other):
         if not isinstance(other, Monomial):
             return False
@@ -73,8 +81,6 @@ class Monomial:
         return False
 
     def __lt__(self, other):
-        if not isinstance(other, Monomial):
-            return False
         if self.get_degree() == other.get_degree():
             return self.comparative_str() >= other.comparative_str()
         return self.get_degree() < other.get_degree()
@@ -85,20 +91,21 @@ class Monomial:
         keys2 = list(other.multipliers_powers.keys())
         if len(keys1) != len(keys2):
             return False
-        if len(keys1) == 0:
+        if not keys1:
             return True
         keys1.sort()
         keys2.sort()
-        for k1, k2 in zip(keys1, keys2):
-            if k1 != k2 or not is_almost_equal_scalars(
-                    self.multipliers_powers[k1], other.multipliers_powers[k1]):
+        for k_1, k_2 in zip(keys1, keys2):
+            if k_1 != k_2 or not is_almost_equal_scalars(
+                    self.multipliers_powers[k_1],
+                    other.multipliers_powers[k_1]):
                 return False
         return True
 
     def __str__(self):
         if self.scalar == 0:
             return "0"
-        if len(self.multipliers_powers) == 0:
+        if not self.multipliers_powers:
             return str(self.scalar)
 
         result = ""
